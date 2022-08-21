@@ -1,7 +1,9 @@
-filename = 'case300';
+%This is the matlab code for verification of the feasibility of OPF solutions
+%IEEE case 300 does not have information for branch flow limits, we set all line constraints to be mpc.branch(:,6)=1000
+filename = 'case300'; %case118,1354
 mpc = loadcase(filename);
 mpc.branch(:,6)=1000;
-%aa=runpf(mpc);
+%generated solution by CCGAN
 p_supply= csvread('p_supply.csv');
 vm_gen = csvread('solutionv_list.csv');
 pq_demand= csvread('demand_list.csv');
@@ -24,11 +26,7 @@ for i=1:1000
     p_sum = sum(p_demand_i,2);
     q_sum = sum(q_demand_i,2);
     p_supply_sum = sum(p_supply_i,2);
-    %if p_sum>240 || p_sum<231
-    %    continue;
-    %end
     l=l+1;
-    
     vm_gen_i = vm_gen(i+1,:);
     mpc.bus(:,3) = p_demand_i(1:bus_number)*100;
     mpc.bus(:,4) = q_demand_i(1:bus_number)*100;
@@ -40,7 +38,6 @@ for i=1:1000
             pp=pp+1;
         end
     end
-
     try 
         [result,success]=runpf(mpc,mpoption('pf.enforce_q_lims', 1,'pf.tol',1e-3,'pf.nr.max_it',10));
     catch
